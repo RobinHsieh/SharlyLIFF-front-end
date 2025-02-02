@@ -1,33 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
   <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>雲端小助手</title>
+  
   <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  
   <!-- 引入外部 CSS -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>管理頁面</h1>
-
-  <table id="schedule-table">
-    <thead>
-      <tr>
-        <th>星期</th>
-        <th>梯次</th>
-        <th>實體課號</th>
-        <th>狀態</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- 這裡用 JavaScript 動態插入資料列 -->
-    </tbody>
-  </table>
+  <div class="container">
+    <h1>管理頁面</h1>
+    <div id="schedule-list">
+      <!-- JavaScript 會在這裡動態插入卡片 -->
+    </div>
+  </div>
 
   <script>
-    // 1. 初始化 LIFF
     async function initLiff() {
       try {
         await liff.init({ liffId: "2006838266-YvLRJn6m" });
@@ -36,12 +28,11 @@
         console.error("LIFF init error", err);
       }
       // 抓取資料
-      items = await fetchItems()
-      // 產生表格
-      renderTable(items);
+      items = await fetchItems();
+      // 產生卡片列表
+      renderList(items);
     }
 
-    // 2. 抓取 DynamoDB 資料，返回資料
     async function fetchItems() {
       try {
         const response = await fetch("https://ozt1li4e01.execute-api.ap-northeast-3.amazonaws.com/prod/");
@@ -53,19 +44,13 @@
       }
     }
 
-    // 將資料依照 WEEK_DAY & BATCH 做排序
-    // WEEK_DAY 先轉成數字排序 (由小到大)
-    // BATCH 假設格式為 "L + 數字"，可擷取數字做數值排序
     function sortData(data) {
       return data.sort((a, b) => {
-        // 先比對 WEEK_DAY
         const dayA = parseInt(a.WEEK_DAY, 10);
         const dayB = parseInt(b.WEEK_DAY, 10);
         if (dayA !== dayB) {
           return dayA - dayB;
         } else {
-          // WEEK_DAY 相同時，比較 BATCH
-          // 假設 BATCH 格式為 "L0", "L1", "L2"...
           const numA = parseInt(a.BATCH.replace('L', ''), 10);
           const numB = parseInt(b.BATCH.replace('L', ''), 10);
           return numA - numB;
@@ -73,81 +58,52 @@
       });
     }
 
-    // 動態產生表格內容
-    function renderTable(data) {
+    function renderList(data) {
       const sortedData = sortData(data);
-      const tbody = document.querySelector("#schedule-table tbody");
-      tbody.innerHTML = ""; // 清空
+      const listContainer = document.getElementById("schedule-list");
+      listContainer.innerHTML = ""; // 清空
 
       sortedData.forEach(item => {
-        const tr = document.createElement("tr");
-        
-        // 星期(WEEK_DAY)
-        const tdWeekDay = document.createElement("td");
-        tdWeekDay.textContent = item.WEEK_DAY;
-        tr.appendChild(tdWeekDay);
+        const card = document.createElement("div");
+        card.classList.add("card");
 
-        // 梯次(BATCH)
-        const tdBatch = document.createElement("td");
-        tdBatch.textContent = item.BATCH;
-        tr.appendChild(tdBatch);
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="week-day">星期 ${item.WEEK_DAY}</span>
+            <span class="batch">梯次 ${item.BATCH}</span>
+          </div>
+          <div class="card-body">
+            <p>課號: <strong>${item.PK}</strong></p>
+            <p>狀態: <span class="${item.IS_OPEN ? 'open' : 'closed'}">${item.IS_OPEN ? "開啟" : "關閉"}</span></p>
+            <div class="button-group">
+              <button class="toggle-btn">${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}</button>
+              <button class="refresh-btn">梯次刷新</button>
+            </div>
+          </div>
+        `;
 
-        // 實體課號(PK)
-        const tdPk = document.createElement("td");
-        tdPk.textContent = item.PK;
-        tr.appendChild(tdPk);
-
-        // 狀態(IS_OPEN)
-        const tdStatus = document.createElement("td");
-        tdStatus.textContent = item.IS_OPEN ? "開啟" : "關閉";
-        tr.appendChild(tdStatus);
-
-        // 操作(兩個按鈕)
-        const tdActions = document.createElement("td");
-
-        // 「更改狀態」按鈕
-        const btnToggle = document.createElement("button");
-        btnToggle.textContent = "更改狀態";
-        btnToggle.addEventListener("click", () => {
-          if (item.IS_OPEN) {
-            // IS_OPEN = true -> 傳送 "梯次狀態 關閉 {PK}"
-            sendLiffMessage(`梯次狀態 關閉 ${item.PK}`);
-          } else {
-            // IS_OPEN = false -> 傳送 "梯次狀態 開啟 {PK}"
-            sendLiffMessage(`梯次狀態 開啟 ${item.PK}`);
-          }
+        // 設定按鈕功能
+        const toggleBtn = card.querySelector(".toggle-btn");
+        toggleBtn.addEventListener("click", () => {
+          sendLiffMessage(`梯次狀態 ${item.IS_OPEN ? "關閉" : "開啟"} ${item.PK}`);
         });
-        tdActions.appendChild(btnToggle);
 
-        // 「梯次刷新」按鈕
-        const btnRefresh = document.createElement("button");
-        btnRefresh.textContent = "梯次刷新";
-        btnRefresh.addEventListener("click", () => {
-          // 傳送 "梯次刷新 {PK}"
+        const refreshBtn = card.querySelector(".refresh-btn");
+        refreshBtn.addEventListener("click", () => {
           sendLiffMessage(`梯次刷新 ${item.PK}`);
         });
-        tdActions.appendChild(btnRefresh);
 
-        tr.appendChild(tdActions);
-
-        // 加到表格
-        tbody.appendChild(tr);
+        listContainer.appendChild(card);
       });
     }
 
-    // 呼叫 liff.sendMessages() 傳送文字訊息
     async function sendLiffMessage(messageText) {
       try {
-        await liff.sendMessages([
-          {
-            type: 'text',
-            text: messageText
-          }
-        ]);
-        alert(`已傳送訊息：${messageText}`);
+        await liff.sendMessages([{ type: 'text', text: messageText }]);
+        alert(`已傳送：${messageText}`);
       } catch (err) {
         console.error("sendMessages error", err);
-        alert("傳送訊息失敗，請確認在 LINE in-app browser 中開啟此頁");
+        alert("傳送失敗，請確認在 LINE in-app browser 開啟");
       }
     }
 
