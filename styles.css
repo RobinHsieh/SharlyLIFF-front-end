@@ -1,0 +1,42 @@
+/* 簡易範例，可依實際需求調整 */
+
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background: #fdfdfd;
+  }
+  
+  h1 {
+    margin-bottom: 15px;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  thead {
+    background-color: #f0f0f0;
+  }
+  
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+  
+  button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #e0e0e0;
+  }
+  
