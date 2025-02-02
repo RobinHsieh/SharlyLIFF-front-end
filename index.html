@@ -3,13 +3,28 @@
 <head>
   <meta charset="utf-8"/>
   <title>雲端小助手</title>
+  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <!-- 引入外部 CSS -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <h1>管理頁面</h1>
-  <ul id="item-list"></ul>
+
+  <table id="schedule-table">
+    <thead>
+      <tr>
+        <th>星期</th>
+        <th>梯次</th>
+        <th>實體課號</th>
+        <th>狀態</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 這裡用 JavaScript 動態插入資料列 -->
+    </tbody>
+  </table>
 
   <script>
     // 1. 初始化 LIFF
@@ -17,13 +32,13 @@
       try {
         await liff.init({ liffId: "2006838266-YvLRJn6m" });
         console.log("LIFF init done");
-        // 抓取資料
-        items = fetchItems()
-        // 產生表格
-        renderTable(items);
       } catch (err) {
         console.error("LIFF init error", err);
       }
+      // 抓取資料
+      items = await fetchItems()
+      // 產生表格
+      renderTable(items);
     }
 
     // 2. 抓取 DynamoDB 資料，返回資料
