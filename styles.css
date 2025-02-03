@@ -23,7 +23,7 @@ body {
   position: relative;       /* 方便後面做絕對定位 */
 }
 
-.header h1 {
+.header h2 {
   margin: 0;          /* 避免預設邊距 */
   flex: 1;            /* 讓 h1 撐滿可用空間 */
   text-align: center; /* 文字置中 */
