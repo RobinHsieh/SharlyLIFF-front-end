@@ -12,13 +12,61 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h2>課程管理</h1>
-      <a href="#" id="help-link">ⓘ 操作講解</a>
+  <!-- 📌 index 主視圖 -->
+  <div id="index-view" class="view">
+    <div class="container">
+      <div class="header">
+        <h2>課程管理</h2>
+        <a href="#" id="help-link">ⓘ 操作講解</a>
+      </div>
+      <div id="schedule-list">
+        <!-- JavaScript 會在這裡動態插入卡片 -->
+      </div>
     </div>
-    <div id="schedule-list">
-      <!-- JavaScript 會在這裡動態插入卡片 -->
+  </div>
+
+  <!-- 📌 help 操作講解視圖（預設隱藏） -->
+  <div id="help-view" class="view" style="display: none;">
+    <div class="container">
+      <div class="header">
+        <h2>🚀 操作講解</h2>
+        <a href="#" id="back-link">返回</a>
+      </div>
+      
+      <h2>1️⃣ 梯次刷新</h2>
+      <h3>👉 同步 Google Drive 資料夾，確保課程列表為最新版本：</h3>
+      <ul>
+          <li>📂 <strong>讀取</strong> 你指定的梯次對應的 Google Drive 資料夾。</li>
+          <li>🔍 <strong>比對</strong> 現有資料，看看是否需要 <strong>加入、刪除或更新</strong> 課堂。</li>
+          <li>🔄 <strong>更新</strong> 資料庫，確保檔案 <strong>ID 和名稱都是最新的</strong>。</li>
+      </ul>
+
+      <h3>🔹 怎麼操作？</h3>
+      <ul>
+          <li>點擊 <strong>「梯次刷新」</strong> 按鈕。</li>
+          <li>系統會進行同步，並回報「新增/修改/刪除」的內容。</li>
+      </ul>
+
+      <div class="tip">
+          ⚠️ <strong>小提醒</strong>：
+          <ul>
+              <li>如果梯次內 <strong>沒有變動</strong>，系統會回報「無需更新」。</li>
+              <li>如果某個梯次 <strong>還沒建立</strong>，系統會回報「數據缺失」。</li>
+          </ul>
+      </div>
+
+      <h2>2️⃣ 梯次狀態</h2>
+      <h3>👉 <strong>開啟或關閉</strong> 某個梯次的課後雲端存取：</h3>
+      <ul>
+          <li>✅ <strong>開啟</strong>：學生可以申請觀看課程。</li>
+          <li>🚫 <strong>關閉</strong>：暫停該梯次的影片共享，無法申請觀看。</li>
+      </ul>
+
+      <h3>🔹 怎麼操作？</h3>
+      <ul>
+          <li>選擇 <strong>「開啟梯次」</strong> 或 <strong>「關閉梯次」</strong> 按鈕。</li>
+          <li>系統會變更該梯次的狀態，並顯示結果。</li>
+      </ul>
     </div>
   </div>
 
@@ -31,8 +79,8 @@
         await liff.init({ liffId: liffId });
         console.log("LIFF init done");
 
-        // 綁定「操作講解」連結
-        document.getElementById("help-link").addEventListener("click", openHelpPage);
+        document.getElementById("help-link").addEventListener("click", showHelpView);
+        document.getElementById("back-link").addEventListener("click", showIndexView);        
       } catch (err) {
         console.error("LIFF init error", err);
       }
@@ -154,7 +202,6 @@
       });
     }
 
-
     function toggleStatus(pk) {
       const item = items.find(i => i.PK === pk);
       if (!item) return;
@@ -178,14 +225,14 @@
       }
     }
 
-    function openHelpPage() {
-      const helpUrl = "help.html";
+    function showHelpView() {
+      document.getElementById("index-view").style.display = "none";
+      document.getElementById("help-view").style.display = "block";
+    }
 
-      // 開啟「操作講解」的 LIFF 頁面
-      liff.openWindow({
-        url: `https://liff.line.me/${liffId}/${helpUrl}`, // 設定「操作講解」的 LIFF 頁面 URL
-        external: false  // **設定為 false，確保在 LIFF 瀏覽器內打開**
-      });
+    function showIndexView() {
+      document.getElementById("help-view").style.display = "none";
+      document.getElementById("index-view").style.display = "block";
     }
 
     window.onload = initLiff;
