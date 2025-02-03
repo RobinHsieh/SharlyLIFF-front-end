@@ -15,11 +15,16 @@ body {
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 h1 {
-  text-align: center;
   color: #333;
   font-size: 22px;
-  margin-bottom: 15px;
+  margin: 0;
 }
 
 /* 課程卡片 */
@@ -90,4 +95,31 @@ button {
 
 .refresh-btn:hover {
   background: #1e88e5;
+}
+
+#help-link {
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#help-link:hover {
+  text-decoration: underline;
+}
+
+/* 關閉按鈕 */
+#close-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#close-btn:hover {
+  background: #cc0000;
 }

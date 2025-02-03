@@ -13,7 +13,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>課程管理</h1>
+    <div class="header">
+      <h1>管理頁面</h1>
+      <a href="#" id="help-link">ⓘ 操作講解</a>
+    </div>
     <div id="schedule-list">
       <!-- JavaScript 會在這裡動態插入卡片 -->
     </div>
@@ -26,6 +29,9 @@
       try {
         await liff.init({ liffId: "2006838266-YvLRJn6m" });
         console.log("LIFF init done");
+
+        // 綁定「操作講解」連結
+        document.getElementById("help-link").addEventListener("click", openHelpPage);
       } catch (err) {
         console.error("LIFF init error", err);
       }
@@ -146,6 +152,19 @@
         console.error("sendMessages error", err);
         alert("傳送失敗，請確認在 LINE in-app browser 開啟");
       }
+    }
+
+    function openHelpPage() {
+      const helpUrl = "https://robinhsieh.github.io/SharlyLIFF-front-end/help.html"; // 你的 help.html 的 Endpoint URL
+      const encodedUrl = encodeURIComponent(helpUrl); // URL 編碼
+      const liffId = "2006838266-YvLRJn6m"; // 你的 LIFF ID
+      const liffUrl = `line://app/${liffId}?redirectUri=${encodedUrl}`;
+
+      // 開啟「操作講解」的 LIFF 頁面
+      liff.openWindow({
+        url: liffUrl, // 設定「操作講解」的 LIFF 頁面 URL
+        external: false  // **設定為 false，確保在 LIFF 瀏覽器內打開**
+      });
     }
 
     window.onload = initLiff;

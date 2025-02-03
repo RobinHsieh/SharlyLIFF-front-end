@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>操作講解</title>
+
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>操作講解</h1>
+      <button id="close-btn">關閉</button>
+    </div>
+    <div class="content">
+      <p>這是操作講解頁面，你可以在這裡加入說明內容。</p>
+      <ul>
+        <li>如何開啟/關閉梯次</li>
+        <li>如何刷新課程資訊</li>
+        <li>如何使用 LIFF 操作</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    async function initLiff() {
+      try {
+        await liff.init({ liffId: "2006838266-YvLRJn6m" });
+        console.log("LIFF 操作講解頁面初始化完成");
+
+        // 綁定關閉按鈕
+        document.getElementById("close-btn").addEventListener("click", closeLiffPage);
+      } catch (err) {
+        console.error("LIFF init error", err);
+      }
+    }
+
+    function closeLiffPage() {
+      if (liff.isInClient()) {
+        liff.closeWindow();  // **關閉 LIFF 瀏覽器**
+      } else {
+        window.history.back();  // 如果不是在 LIFF 內，則返回上一頁
+      }
+    }
+
+    window.onload = initLiff;
+  </script>
+</body>
+</html>
