@@ -20,7 +20,7 @@
   </div>
 
   <script>
-    let items = []; // 存放課程資料
+    let items = [];  // 存放課程資料（目前的 UI 狀態）
 
     async function initLiff() {
       try {
@@ -29,8 +29,17 @@
       } catch (err) {
         console.error("LIFF init error", err);
       }
-      items = await fetchItems();
+
+      // **先顯示目前的 items**
       renderList(items);
+
+      // **後台同步抓取最新資料**
+      syncData();
+    }
+
+    async function syncData() {
+      const newData = await fetchItems();
+      updateList(newData);
     }
 
     async function fetchItems() {
@@ -62,49 +71,71 @@
     function renderList(data) {
       const sortedData = sortData(data);
       const listContainer = document.getElementById("schedule-list");
-      listContainer.innerHTML = ""; // 清空
 
       sortedData.forEach((item, index) => {
-        const card = document.createElement("div");
-        card.classList.add("card");
+        if (!document.getElementById(`card-${item.PK}`)) {
+          const card = document.createElement("div");
+          card.classList.add("card");
+          card.id = `card-${item.PK}`;
 
-        card.innerHTML = `
-          <div class="card-header">
-            <span class="week-day">星期 ${item.WEEK_DAY}</span>
-            <span class="batch">梯次 ${item.BATCH}</span>
-          </div>
-          <div class="card-body">
-            <p>課號: <strong>${item.PK}</strong></p>
-            <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">${item.IS_OPEN ? "開啟" : "關閉"}</span></p>
-            <div class="button-group">
-              <button id="toggle-btn-${item.PK}" class="toggle-btn">${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}</button>
-              <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">梯次刷新</button>
+          card.innerHTML = `
+            <div class="card-header">
+              <span class="week-day">星期 ${item.WEEK_DAY}</span>
+              <span class="batch">梯次 ${item.BATCH}</span>
             </div>
-          </div>
-        `;
+            <div class="card-body">
+              <p>課號: <strong>${item.PK}</strong></p>
+              <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">${item.IS_OPEN ? "開啟" : "關閉"}</span></p>
+              <div class="button-group">
+                <button id="toggle-btn-${item.PK}" class="toggle-btn">${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}</button>
+                <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">梯次刷新</button>
+              </div>
+            </div>
+          `;
 
-        // 設定「更改狀態」按鈕
-        const toggleBtn = card.querySelector(`#toggle-btn-${item.PK}`);
-        toggleBtn.addEventListener("click", () => {
-          toggleStatus(item.PK);
-        });
+          // 設定「更改狀態」按鈕
+          const toggleBtn = card.querySelector(`#toggle-btn-${item.PK}`);
+          toggleBtn.addEventListener("click", () => {
+            toggleStatus(item.PK);
+          });
 
-        listContainer.appendChild(card);
+          listContainer.appendChild(card);
+        }
       });
     }
 
+    function updateList(newData) {
+      const newItemsMap = new Map(newData.map(item => [item.PK, item]));
+
+      newItemsMap.forEach((newItem, pk) => {
+        const oldItem = items.find(i => i.PK === pk);
+        
+        if (!oldItem) {
+          // **新資料，直接新增**
+          renderList([newItem]);
+        } else if (oldItem.IS_OPEN !== newItem.IS_OPEN) {
+          // **已有資料但狀態改變，更新 UI**
+          document.getElementById(`status-${pk}`).textContent = newItem.IS_OPEN ? "開啟" : "關閉";
+          document.getElementById(`status-${pk}`).className = newItem.IS_OPEN ? "open" : "closed";
+          document.getElementById(`toggle-btn-${pk}`).textContent = newItem.IS_OPEN ? "關閉梯次" : "開啟梯次";
+        }
+      });
+
+      // **更新本地 items**
+      items = newData;
+    }
+
     function toggleStatus(pk) {
-      // 取得當前課程資料
       const item = items.find(i => i.PK === pk);
       if (!item) return;
 
-      // **先更新 UI**（即時變更狀態）
+      // **立即更新 UI**
       item.IS_OPEN = !item.IS_OPEN;
       document.getElementById(`status-${pk}`).textContent = item.IS_OPEN ? "開啟" : "關閉";
       document.getElementById(`status-${pk}`).className = item.IS_OPEN ? "open" : "closed";
       document.getElementById(`toggle-btn-${pk}`).textContent = item.IS_OPEN ? "關閉梯次" : "開啟梯次";
 
-      // **再發送 LINE 訊息**
+      // **發送 LINE 訊息**
       sendLiffMessage(`梯次狀態 ${item.IS_OPEN ? "開啟" : "關閉"} ${pk}`);
     }
 
