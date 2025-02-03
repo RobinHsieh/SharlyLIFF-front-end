@@ -76,71 +76,84 @@
     }
 
     function renderList(data) {
-      const sortedData = sortData(data);  // **確保資料先排序**
+      const sortedData = sortData(data);
       const listContainer = document.getElementById("schedule-list");
 
-      // **使用 DocumentFragment，避免直接操作 DOM 導致重繪**
-      const fragment = document.createDocumentFragment();
-
-      sortedData.forEach((item) => {
-        let card = document.getElementById(`card-${item.PK}`);
-        if (!card) {
-          card = document.createElement("div");
+      sortedData.forEach((item, index) => {
+        if (!document.getElementById(`card-${item.PK}`)) {
+          const card = document.createElement("div");
           card.classList.add("card");
           card.id = `card-${item.PK}`;
-        }
 
-        // **確保每次都更新內容**
-        card.innerHTML = `
-          <div class="card-header">
-            <span class="week-day">星期 ${item.WEEK_DAY}</span>
-            <span class="batch">梯次 ${item.BATCH}</span>
-          </div>
-          <div class="card-body">
-            <p>課號: <strong>${item.PK}</strong></p>
-            <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">${item.IS_OPEN ? "開啟" : "關閉"}</span></p>
-            <div class="button-group">
-              <button id="toggle-btn-${item.PK}" class="toggle-btn">${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}</button>
-              <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">梯次刷新</button>
+          card.innerHTML = `
+            <div class="card-header">
+              <span class="week-day">星期 ${item.WEEK_DAY}</span>
+              <span class="batch">梯次 ${item.BATCH}</span>
             </div>
-          </div>
-        `;
+            <div class="card-body">
+              <p>課號: <strong>${item.PK}</strong></p>
+              <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">${item.IS_OPEN ? "開啟" : "關閉"}</span></p>
+              <div class="button-group">
+                <button id="toggle-btn-${item.PK}" class="toggle-btn">${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}</button>
+                <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">梯次刷新</button>
+              </div>
+            </div>
+          `;
 
-        // **綁定事件**
-        const toggleBtn = card.querySelector(`#toggle-btn-${item.PK}`);
-        toggleBtn.addEventListener("click", () => {
-          toggleStatus(item.PK);
-        });
+          // 設定「更改狀態」按鈕
+          const toggleBtn = card.querySelector(`#toggle-btn-${item.PK}`);
+          toggleBtn.addEventListener("click", () => {
+            toggleStatus(item.PK);
+          });
 
-        fragment.appendChild(card);
+          listContainer.appendChild(card);
+        }
       });
-
-      // **一次性更新 DOM，確保順序正確**
-      listContainer.innerHTML = "";
-      listContainer.appendChild(fragment);
     }
 
-
     function updateList(newData) {
+      // 用 Map 快取 newData，key 為 PK
       const newItemsMap = new Map(newData.map(item => [item.PK, item]));
 
+      // 與本地 items 做比較
       newItemsMap.forEach((newItem, pk) => {
         const oldItem = items.find(i => i.PK === pk);
         
         if (!oldItem) {
-          // **新資料，直接新增**
+          // 新課程 -> 新增卡片
           renderList([newItem]);
         } else if (oldItem.IS_OPEN !== newItem.IS_OPEN) {
-          // **已有資料但狀態改變，更新 UI**
+          // 狀態改變 -> 局部更新該卡片 UI
           document.getElementById(`status-${pk}`).textContent = newItem.IS_OPEN ? "開啟" : "關閉";
           document.getElementById(`status-${pk}`).className = newItem.IS_OPEN ? "open" : "closed";
           document.getElementById(`toggle-btn-${pk}`).textContent = newItem.IS_OPEN ? "關閉梯次" : "開啟梯次";
         }
       });
 
-      // **更新本地 items**
+      // 更新本地 items
       items = newData;
+
+      // **在此呼叫重排函式**，確保 DOM 卡片順序正確
+      reorderDomElements();
     }
+
+    function reorderDomElements() {
+      // 1. 排序當前 items
+      const sortedData = sortData(items);
+
+      // 2. 依照排序結果逐一把對應卡片 append 到最末端
+      const listContainer = document.getElementById("schedule-list");
+
+      sortedData.forEach(item => {
+        const card = document.getElementById(`card-${item.PK}`);
+        // 如果卡片存在，就把它重新 append 一次
+        if (card) {
+          listContainer.appendChild(card);
+          // 這行會把 card 移到容器最後，形成最終的正確順序
+        }
+      });
+    }
+
 
     function toggleStatus(pk) {
       const item = items.find(i => i.PK === pk);
