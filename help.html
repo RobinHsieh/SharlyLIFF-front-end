@@ -37,7 +37,11 @@
       } catch (err) {
         console.error("LIFF init error", err);
       }
-      alert("isInClient?", liff.isInClient());
+      if (liff.isInClient()) {
+        alert("isInClient?: true");
+      } else {
+        alert("isInClient?: false");
+      }
     }
 
     function closeLiffPage() {
