@@ -24,10 +24,11 @@
 
   <script>
     let items = [];  // 存放課程資料（目前的 UI 狀態）
+    const liffId = "2006838266-YvLRJn6m";
 
     async function initLiff() {
       try {
-        await liff.init({ liffId: "2006838266-YvLRJn6m" });
+        await liff.init({ liffId: liffId });
         console.log("LIFF init done");
 
         // 綁定「操作講解」連結
@@ -75,40 +76,50 @@
     }
 
     function renderList(data) {
-      const sortedData = sortData(data);
+      const sortedData = sortData(data);  // **確保資料先排序**
       const listContainer = document.getElementById("schedule-list");
 
-      sortedData.forEach((item, index) => {
-        if (!document.getElementById(`card-${item.PK}`)) {
-          const card = document.createElement("div");
+      // **使用 DocumentFragment，避免直接操作 DOM 導致重繪**
+      const fragment = document.createDocumentFragment();
+
+      sortedData.forEach((item) => {
+        let card = document.getElementById(`card-${item.PK}`);
+        if (!card) {
+          card = document.createElement("div");
           card.classList.add("card");
           card.id = `card-${item.PK}`;
-
-          card.innerHTML = `
-            <div class="card-header">
-              <span class="week-day">星期 ${item.WEEK_DAY}</span>
-              <span class="batch">梯次 ${item.BATCH}</span>
-            </div>
-            <div class="card-body">
-              <p>課號: <strong>${item.PK}</strong></p>
-              <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">${item.IS_OPEN ? "開啟" : "關閉"}</span></p>
-              <div class="button-group">
-                <button id="toggle-btn-${item.PK}" class="toggle-btn">${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}</button>
-                <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">梯次刷新</button>
-              </div>
-            </div>
-          `;
-
-          // 設定「更改狀態」按鈕
-          const toggleBtn = card.querySelector(`#toggle-btn-${item.PK}`);
-          toggleBtn.addEventListener("click", () => {
-            toggleStatus(item.PK);
-          });
-
-          listContainer.appendChild(card);
         }
+
+        // **確保每次都更新內容**
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="week-day">星期 ${item.WEEK_DAY}</span>
+            <span class="batch">梯次 ${item.BATCH}</span>
+          </div>
+          <div class="card-body">
+            <p>課號: <strong>${item.PK}</strong></p>
+            <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">${item.IS_OPEN ? "開啟" : "關閉"}</span></p>
+            <div class="button-group">
+              <button id="toggle-btn-${item.PK}" class="toggle-btn">${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}</button>
+              <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">梯次刷新</button>
+            </div>
+          </div>
+        `;
+
+        // **綁定事件**
+        const toggleBtn = card.querySelector(`#toggle-btn-${item.PK}`);
+        toggleBtn.addEventListener("click", () => {
+          toggleStatus(item.PK);
+        });
+
+        fragment.appendChild(card);
       });
+
+      // **一次性更新 DOM，確保順序正確**
+      listContainer.innerHTML = "";
+      listContainer.appendChild(fragment);
     }
+
 
     function updateList(newData) {
       const newItemsMap = new Map(newData.map(item => [item.PK, item]));
@@ -157,7 +168,6 @@
     function openHelpPage() {
       const helpUrl = "https://robinhsieh.github.io/SharlyLIFF-front-end/help.html"; // 你的 help.html 的 Endpoint URL
       const encodedUrl = encodeURIComponent(helpUrl); // URL 編碼
-      const liffId = "2006838266-YvLRJn6m"; // 你的 LIFF ID
       const liffUrl = `line://app/${liffId}?redirectUri=${encodedUrl}`;
 
       // 開啟「操作講解」的 LIFF 頁面
