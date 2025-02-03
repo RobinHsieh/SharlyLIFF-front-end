@@ -16,15 +16,22 @@ body {
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  /* 讓 .header 變成 flex container */
+  display: flex;         
+  align-items: center;   
+  justify-content: center;  /* 先讓內容都在水平方向置中 */
+  position: relative;       /* 方便後面做絕對定位 */
 }
 
-h1 {
-  color: #333;
-  font-size: 22px;
-  margin: 0;
+.header h1 {
+  margin: 0;          /* 避免預設邊距 */
+  flex: 1;            /* 讓 h1 撐滿可用空間 */
+  text-align: center; /* 文字置中 */
+}
+
+.header a {
+  position: absolute; /* 讓連結可以靠右 */
+  right: 10px;
 }
 
 /* 課程卡片 */
