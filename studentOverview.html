@@ -8,7 +8,7 @@
   <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <!-- 引入共用的 liffRedirect.js -->
-  <script src="liffRedirect.js"></script>
+  <!--<script src="liffRedirect.js"></script>-->
   <!-- 引入外部 CSS -->
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -80,7 +80,7 @@
         await liff.init({ liffId: liffId });
         console.log("LIFF init done");
 
-        handleLiffRedirect();
+        // handleLiffRedirect();
 
         document.getElementById("help-link").addEventListener("click", showHelpView);
         document.getElementById("back-link").addEventListener("click", showIndexView);        
