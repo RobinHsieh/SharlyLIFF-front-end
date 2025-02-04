@@ -21,20 +21,17 @@
         await liff.init({ liffId });
         console.log("LIFF init done");
 
-        // 取得 URL 中的 liff.state 參數（例如：/courseDashboard.html）
+        // 取得 URL 中的 content 參數（例如：?content=courseDashboard）
         const urlParams = new URLSearchParams(window.location.search);
-        let page = "studentOverview.html"; // 預設頁面
-        if(urlParams.get("liff.state")){
-          page = decodeURIComponent(urlParams.get("liff.state")).replace(/^\//, "");
-        }
-        // 用一個對照表，決定載入哪個內容檔案
+        let content = urlParams.get("content") || "studentOverview";  // 預設為 studentOverview
+        // 用對照表決定要載入的內容 Partial 檔案名稱
         const mapping = {
-          "courseDashboard.html": "courseDashboard-content.html",
-          "studentOverview.html": "studentOverview-content.html"
+          "courseDashboard": "courseDashboard-content.html",
+          "studentOverview": "studentOverview-content.html"
         };
-        const contentPage = mapping[page] || "studentOverview-content.html";
+        const contentPage = mapping[content] || "studentOverview-content.html";
         loadContent(contentPage);
-      } catch(err) {
+      } catch (err) {
         console.error("LIFF init error", err);
         document.getElementById("app").innerHTML = "<p>LIFF 初始化錯誤</p>";
       }
@@ -49,8 +46,8 @@
         }
         const html = await response.text();
         document.getElementById("app").innerHTML = html;
-        // ※ 若內容中有需要初始化的程式碼，請在這裡調用對應的初始化函式
-      } catch(err) {
+        // 如果 Partial 裡面有初始化程式碼，可以在這裡呼叫相應的初始化函式
+      } catch (err) {
         console.error(err);
         document.getElementById("app").innerHTML = "<p>載入錯誤</p>";
       }
