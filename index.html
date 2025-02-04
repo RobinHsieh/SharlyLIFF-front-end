@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>雲端小助手 Redirect</title>
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- 引入共用的 liffRedirect.js -->
+  <script src="liffRedirect.js"></script>
+</head>
+<body>
+  <script>
+    const liffId = "2006838266-YvLRJn6m";
+    async function init() {
+      try {
+        await liff.init({ liffId });
+        console.log("LIFF init done");
+        // 呼叫重導邏輯
+        handleLiffRedirect();
+
+        // 如果 URL 中沒有 liff.state 參數，預設導向 studentOverview.html
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.get("liff.state")) {
+          window.location.replace("studentOverview.html");
+        }
+      } catch (err) {
+        console.error("LIFF init error", err);
+      }
+    }
+    window.onload = init;
+  </script>
+</body>
+</html>
