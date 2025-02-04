@@ -1,5 +1,3 @@
-let items = [];  // 存放課程資料
-
 async function initStudentOverview() {
     try {
         console.log("StudentOverview: LIFF 已初始化");

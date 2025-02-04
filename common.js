@@ -1,3 +1,5 @@
+let items = [];  // 存放課程資料
+
 async function fetchItems() {
     try {
         const response = await fetch("https://ozt1li4e01.execute-api.ap-northeast-3.amazonaws.com/prod/");

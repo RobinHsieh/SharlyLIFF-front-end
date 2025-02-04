@@ -2,7 +2,6 @@
 ※ 建議將這些共用函式（例如 renderList、syncData 等）抽出成共用檔案，
 或至少確保載入後只執行一次初始化。
 */
-let items = [];  // 存放課程資料
 
 async function initCourseDashboard() {
     try {
