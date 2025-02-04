@@ -48,6 +48,11 @@
         const html = await response.text();
         document.getElementById("app").innerHTML = html;
         // 如果 Partial 裡面有初始化程式碼，可以在這裡呼叫相應的初始化函式
+        if (page === "courseDashboardContent.html") {
+          initCourseDashboard();
+        } else if (page === "studentOverviewContent.html") {
+          initStudentOverview();
+        }
       } catch (err) {
         console.error(err);
         document.getElementById("app").innerHTML = "<p>載入錯誤</p>";
