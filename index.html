@@ -7,6 +7,7 @@
   <!-- 載入共用 CSS -->
   <link rel="stylesheet" href="styles.css" />
   <!-- 載入共用 JavaScript -->
+  <script src="common.js"></script>
   <script src="courseDashboard.js"></script>
   <script src="studentOverview.js"></script>
   <!-- 載入 LIFF SDK -->
@@ -26,7 +27,7 @@
 
         // 取得 URL 中的 content 參數（例如：?content=courseDashboard）
         const urlParams = new URLSearchParams(window.location.search);
-        let content = urlParams.get("content") || "studentOverview";  // 預設為 studentOverview
+        let content = urlParams.get("content");
         // 用對照表決定要載入的內容 Partial 檔案名稱
         const mapping = {
           "courseDashboard": "courseDashboardContent.html",
