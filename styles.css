@@ -103,6 +103,33 @@ button {
   background: #1e88e5;
 }
 
+.leave-btn {
+  background: #ff4d4d;
+  color: white;
+}
+
+.leave-btn:hover {
+  background: #cc0000;
+}
+
+.late-btn {
+  background: #ff7043;
+  color: white;
+}
+
+.late-btn:hover {
+  background: #f4511e;
+}
+
+.recital-btn {
+  background: #42a5f5;
+  color: white;
+}
+
+.recital-btn:hover {
+  background: #1e88e5;
+}
+
 #help-link {
   font-size: 14px;
   color: #007bff;
