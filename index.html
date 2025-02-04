@@ -26,10 +26,11 @@
         let content = urlParams.get("content") || "studentOverview";  // 預設為 studentOverview
         // 用對照表決定要載入的內容 Partial 檔案名稱
         const mapping = {
-          "courseDashboard": "courseDashboard-content.html",
-          "studentOverview": "studentOverview-content.html"
+          "courseDashboard": "courseDashboardContent.html",
+          "studentOverview": "studentOverviewContent.html"
         };
-        const contentPage = mapping[content] || "studentOverview-content.html";
+        // const contentPage = mapping[content] || "studentOverview-content.html";
+        const contentPage = mapping[content];
         loadContent(contentPage);
       } catch (err) {
         console.error("LIFF init error", err);
