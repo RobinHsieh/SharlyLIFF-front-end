@@ -13,7 +13,7 @@
 </head>
 <body>
   <!-- 📌 index 主視圖 -->
-  <div id="index-view" class="view">
+  <div id="courseDashboard-view" class="view">
     <div class="container">
       <div class="header">
         <h2>課程管理</h2>
@@ -38,7 +38,7 @@
       <ul>
           <li>📂 <strong>讀取</strong> 你指定的梯次對應的 Google Drive 資料夾。</li>
           <li>🔍 <strong>比對</strong> 現有資料，看看是否需要 <strong>加入、刪除或更新</strong> 課堂。</li>
-          <li>🔄 <strong>更新</strong> 資料庫，確保檔案 <strong>ID 和名稱都是最新的</strong>。</li>
+          <li>🔄 <strong>更新</strong> 資料庫，確保 <strong>檔案ID 和名稱都是最新的</strong>。</li>
       </ul>
 
       <h3>🔹 怎麼操作？</h3>
@@ -56,7 +56,7 @@
       </div>
 
       <h2>2️⃣ 梯次狀態</h2>
-      <h3>👉 <strong>開啟或關閉</strong> 某個梯次的課後雲端存取：</h3>
+      <h3>👉 <strong>開啟或關閉</strong> 某個梯次的課後雲端：</h3>
       <ul>
           <li>✅ <strong>開啟</strong>：學生可以申請觀看課程。</li>
           <li>🚫 <strong>關閉</strong>：暫停該梯次的影片共享，無法申請觀看。</li>
@@ -226,13 +226,13 @@
     }
 
     function showHelpView() {
-      document.getElementById("index-view").style.display = "none";
+      document.getElementById("courseDashboard-view").style.display = "none";
       document.getElementById("help-view").style.display = "block";
     }
 
     function showIndexView() {
       document.getElementById("help-view").style.display = "none";
-      document.getElementById("index-view").style.display = "block";
+      document.getElementById("courseDashboard-view").style.display = "block";
     }
 
     window.onload = initLiff;
