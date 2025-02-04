@@ -1,0 +1,23 @@
+<script>
+    async function initLiff() {
+      const liffId = "2006838266-YvLRJn6m";
+      await liff.init({ liffId });
+  
+      // 解析 URL 參數
+      const urlParams = new URLSearchParams(window.location.search);
+      const liffState = urlParams.get("liff.state");
+  
+      if (liffState) {
+        const targetPath = decodeURIComponent(liffState);
+        const validPaths = ["/courseDashboard.html", "/studentOverview.html"];
+  
+        if (validPaths.includes(targetPath)) {
+          window.location.replace(targetPath);
+          return;  // 確保不執行後續代碼
+        }
+      }
+    }
+  
+    window.onload = initLiff;
+  </script>
+  
