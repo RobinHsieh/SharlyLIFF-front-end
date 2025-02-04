@@ -1,0 +1,205 @@
+<!-- courseDashboard-content.html -->
+<!-- 課程管理視圖 -->
+<div id="courseDashboard-view" class="view">
+  <div class="container">
+    <div class="header">
+      <h2>課程管理</h2>
+      <a href="#" id="help-link">ⓘ 操作講解</a>
+    </div>
+    <div id="schedule-list">
+      <!-- JavaScript 會在這裡動態插入卡片 -->
+    </div>
+  </div>
+</div>
+
+<!-- 操作講解視圖（預設隱藏） -->
+<div id="help-view" class="view" style="display: none;">
+  <div class="container">
+    <div class="header">
+      <h2>操作講解</h2>
+      <a href="#" id="back-link">返回</a>
+    </div>
+    <h2>1️⃣ 梯次刷新</h2>
+    <h3>👉 同步 Google Drive 資料夾，確保課程列表為最新版本：</h3>
+    <ul>
+      <li>📂 <strong>讀取</strong> 你指定的梯次對應的 Google Drive 資料夾。</li>
+      <li>🔍 <strong>比對</strong> 現有資料，看看是否需要 <strong>加入、刪除或更新</strong> 課堂。</li>
+      <li>🔄 <strong>更新</strong> 資料庫，確保 <strong>檔案ID 和名稱都是最新的</strong>。</li>
+    </ul>
+    <h3>🔹 怎麼操作？</h3>
+    <ul>
+      <li>點擊 <strong>「梯次刷新」</strong> 按鈕。</li>
+      <li>系統會進行同步，並回報「新增/修改/刪除」的內容。</li>
+    </ul>
+    <div class="tip">
+      ⚠️ <strong>小提醒</strong>：
+      <ul>
+        <li>如果梯次內 <strong>沒有變動</strong>，系統會回報「無需更新」。</li>
+        <li>如果某個梯次 <strong>還沒建立</strong>，系統會回報「數據缺失」。</li>
+      </ul>
+    </div>
+    <h2>2️⃣ 梯次狀態</h2>
+    <h3>👉 <strong>開啟或關閉</strong> 某個梯次的課後雲端：</h3>
+    <ul>
+      <li>✅ <strong>開啟</strong>：學生可以申請觀看課程。</li>
+      <li>🚫 <strong>關閉</strong>：暫停該梯次的影片共享，無法申請觀看。</li>
+    </ul>
+    <h3>🔹 怎麼操作？</h3>
+    <ul>
+      <li>選擇 <strong>「開啟梯次」</strong> 或 <strong>「關閉梯次」</strong> 按鈕。</li>
+      <li>系統會變更該梯次的狀態，並顯示結果。</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  /* 以下是課程管理頁面的 JavaScript 程式碼（與原本 courseDashboard.html 中的內容相同）
+     ※ 建議將這些共用函式（例如 renderList、syncData 等）抽出成共用檔案，
+       或至少確保載入後只執行一次初始化。
+  */
+  let items = [];  // 存放課程資料
+
+  async function initCourseDashboard() {
+    try {
+      console.log("CourseDashboard: LIFF 已初始化");
+      document.getElementById("help-link").addEventListener("click", showHelpView);
+      document.getElementById("back-link").addEventListener("click", showIndexView);        
+    } catch (err) {
+      console.error("課程管理頁面初始化錯誤", err);
+    }
+    renderList(items);
+    syncData();
+  }
+
+  async function syncData() {
+    const newData = await fetchItems();
+    updateList(newData);
+  }
+
+  async function fetchItems() {
+    try {
+      const response = await fetch("https://ozt1li4e01.execute-api.ap-northeast-3.amazonaws.com/prod/");
+      const data = await response.json();
+      console.log("取得資料成功");
+      return data;
+    } catch (err) {
+      console.error("取得資料錯誤", err);
+      return [];
+    }
+  }
+
+  function sortData(data) {
+    return data.sort((a, b) => {
+      const dayA = parseInt(a.WEEK_DAY, 10);
+      const dayB = parseInt(b.WEEK_DAY, 10);
+      if (dayA !== dayB) {
+        return dayA - dayB;
+      } else {
+        const numA = parseInt(a.BATCH.replace('L', ''), 10);
+        const numB = parseInt(b.BATCH.replace('L', ''), 10);
+        return numA - numB;
+      }
+    });
+  }
+
+  function renderList(data) {
+    const sortedData = sortData(data);
+    const listContainer = document.getElementById("schedule-list");
+
+    sortedData.forEach(item => {
+      if (!document.getElementById(`card-${item.PK}`)) {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.id = `card-${item.PK}`;
+
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="week-day">星期 ${item.WEEK_DAY}</span>
+            <span class="batch">梯次 ${item.BATCH}</span>
+          </div>
+          <div class="card-body">
+            <p>課號: <strong>${item.PK}</strong></p>
+            <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">
+              ${item.IS_OPEN ? "開啟" : "關閉"}
+            </span></p>
+            <div class="button-group">
+              <button id="toggle-btn-${item.PK}" class="toggle-btn">
+                ${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}
+              </button>
+              <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">
+                梯次刷新
+              </button>
+            </div>
+          </div>
+        `;
+
+        const toggleBtn = card.querySelector(`#toggle-btn-${item.PK}`);
+        toggleBtn.addEventListener("click", () => {
+          toggleStatus(item.PK);
+        });
+
+        listContainer.appendChild(card);
+      }
+    });
+  }
+
+  function updateList(newData) {
+    const newItemsMap = new Map(newData.map(item => [item.PK, item]));
+
+    newItemsMap.forEach((newItem, pk) => {
+      const oldItem = items.find(i => i.PK === pk);
+      if (!oldItem) {
+        renderList([newItem]);
+      } else if (oldItem.IS_OPEN !== newItem.IS_OPEN) {
+        document.getElementById(`status-${pk}`).textContent = newItem.IS_OPEN ? "開啟" : "關閉";
+        document.getElementById(`status-${pk}`).className = newItem.IS_OPEN ? "open" : "closed";
+        document.getElementById(`toggle-btn-${pk}`).textContent = newItem.IS_OPEN ? "關閉梯次" : "開啟梯次";
+      }
+    });
+
+    items = newData;
+    reorderDomElements();
+  }
+
+  function reorderDomElements() {
+    const sortedData = sortData(items);
+    const listContainer = document.getElementById("schedule-list");
+    sortedData.forEach(item => {
+      const card = document.getElementById(`card-${item.PK}`);
+      if (card) {
+        listContainer.appendChild(card);
+      }
+    });
+  }
+
+  function toggleStatus(pk) {
+    const item = items.find(i => i.PK === pk);
+    if (!item) return;
+    item.IS_OPEN = !item.IS_OPEN;
+    document.getElementById(`status-${pk}`).textContent = item.IS_OPEN ? "開啟" : "關閉";
+    document.getElementById(`status-${pk}`).className = item.IS_OPEN ? "open" : "closed";
+    document.getElementById(`toggle-btn-${pk}`).textContent = item.IS_OPEN ? "關閉梯次" : "開啟梯次";
+    sendLiffMessage(`梯次狀態 ${item.IS_OPEN ? "開啟" : "關閉"} ${pk}`);
+  }
+
+  async function sendLiffMessage(messageText) {
+    try {
+      await liff.sendMessages([{ type: 'text', text: messageText }]);
+    } catch (err) {
+      console.error("sendMessages error", err);
+      alert("傳送失敗，請確認在 LINE in-app browser 開啟");
+    }
+  }
+
+  function showHelpView() {
+    document.getElementById("courseDashboard-view").style.display = "none";
+    document.getElementById("help-view").style.display = "block";
+  }
+
+  function showIndexView() {
+    document.getElementById("help-view").style.display = "none";
+    document.getElementById("courseDashboard-view").style.display = "block";
+  }
+
+  window.addEventListener("load", initCourseDashboard);
+</script>
