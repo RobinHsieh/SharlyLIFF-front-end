@@ -2,7 +2,7 @@ async function initStudentOverview() {
     try {
         console.log("StudentOverview: LIFF 已初始化");
         document.getElementById("help-link").addEventListener("click", showStudentOverviewHelpView);
-        document.getElementById("back-link").addEventListener("click", showIndexView);
+        document.getElementById("back-link").addEventListener("click", showStudentOverviewView);
     } catch (err) {
         console.error("請假狀況頁面初始化錯誤", err);
     }
@@ -87,7 +87,7 @@ function showStudentOverviewHelpView() {
     document.getElementById("help-view").style.display = "block";
 }
 
-function showIndexView() {
+function showStudentOverviewView() {
     document.getElementById("help-view").style.display = "none";
     document.getElementById("studentOverview-view").style.display = "block";
 }

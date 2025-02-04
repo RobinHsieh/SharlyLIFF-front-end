@@ -7,7 +7,7 @@ async function initCourseDashboard() {
     try {
         console.log("CourseDashboard: LIFF 已初始化");
         document.getElementById("help-link").addEventListener("click", showCourseDashboardHelpView);
-        document.getElementById("back-link").addEventListener("click", showIndexView);
+        document.getElementById("back-link").addEventListener("click", showCourseDashboardView);
     } catch (err) {
         console.error("課程管理頁面初始化錯誤", err);
     }
@@ -114,7 +114,7 @@ function showCourseDashboardHelpView() {
     document.getElementById("help-view").style.display = "block";
 }
 
-function showIndexView() {
+function showCourseDashboardView() {
     document.getElementById("help-view").style.display = "none";
     document.getElementById("courseDashboard-view").style.display = "block";
 }
