@@ -13,7 +13,7 @@
 </head>
 <body>
   <!-- 📌 index 主視圖 -->
-  <div id="attendanceOverview-view" class="view">
+  <div id="studentOverview-view" class="view">
     <div class="container">
       <div class="header">
         <h2>請假狀況</h2>
@@ -227,13 +227,13 @@
     }
 
     function showHelpView() {
-      document.getElementById("attendanceOverview-view").style.display = "none";
+      document.getElementById("studentOverview-view").style.display = "none";
       document.getElementById("help-view").style.display = "block";
     }
 
     function showIndexView() {
       document.getElementById("help-view").style.display = "none";
-      document.getElementById("attendanceOverview-view").style.display = "block";
+      document.getElementById("studentOverview-view").style.display = "block";
     }
 
     window.onload = initLiff;
