@@ -39,13 +39,16 @@ function renderCourseDashboardList(data) {
             <p>課號: <strong>${item.PK}</strong></p>
             <p>狀態: <span id="status-${item.PK}" class="${item.IS_OPEN ? 'open' : 'closed'}">
             ${item.IS_OPEN ? "開啟" : "關閉"}
-            </span></p>
+            </span>
+            </p>
+            <p>補課次數規則: ${item.VIEW_LIMIT_STRATEGY}</p>
+            <p>理由審核規則: ${item.REVIEW_REASON_STRATEGY}</p>
             <div class="button-group">
             <button id="toggle-btn-${item.PK}" class="toggle-btn">
                 ${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}
             </button>
-            <button class="refresh-btn" onclick="sendLiffMessage('梯次刷新 ${item.PK}')">
-                梯次刷新
+            <button class="refresh-btn" onclick="sendLiffMessage('梯次資料夾刷新 ${item.PK}')">
+                梯次資料夾刷新
             </button>
             </div>
         </div>
@@ -118,6 +121,3 @@ function showCourseDashboardView() {
     document.getElementById("help-view").style.display = "none";
     document.getElementById("courseDashboard-view").style.display = "block";
 }
-
-// window.addEventListener("load", initCourseDashboard);
-
