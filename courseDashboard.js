@@ -100,7 +100,7 @@ function toggleStatus(pk) {
     document.getElementById(`status-${pk}`).textContent = item.IS_OPEN ? "開啟" : "關閉";
     document.getElementById(`status-${pk}`).className = item.IS_OPEN ? "open" : "closed";
     document.getElementById(`toggle-btn-${pk}`).textContent = item.IS_OPEN ? "關閉梯次" : "開啟梯次";
-    sendLiffMessage(`梯次狀態 ${item.IS_OPEN ? "開啟" : "關閉"} ${pk}`);
+    sendLiffMessage(`梯次開關 ${item.IS_OPEN ? "開啟" : "關閉"} ${pk}`);
 }
 
 async function sendLiffMessage(messageText) {
