@@ -68,6 +68,10 @@ body {
   font-weight: bold;
 }
 
+.rule-stragety {
+  color: #42a5f5
+}
+
 .button-group {
   display: flex;
   justify-content: space-between;

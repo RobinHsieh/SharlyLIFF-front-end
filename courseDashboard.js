@@ -41,8 +41,8 @@ function renderCourseDashboardList(data) {
             ${item.IS_OPEN ? "開啟" : "關閉"}
             </span>
             </p>
-            <p>補課次數規則: ${item.VIEW_LIMIT_STRATEGY}</p>
-            <p>理由審核規則: ${item.REVIEW_REASON_STRATEGY}</p>
+            <p>補課次數規則: <em class="rule-strategy">${item.VIEW_LIMIT_STRATEGY}</em></p>
+            <p>理由審核規則: <em class="rule-strategy">${item.REVIEW_REASON_STRATEGY}</em></p>
             <div class="button-group">
             <button id="toggle-btn-${item.PK}" class="toggle-btn">
                 ${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}
@@ -112,11 +112,13 @@ async function sendLiffMessage(messageText) {
     }
 }
 
+/* callback function */
 function showCourseDashboardHelpView() {
     document.getElementById("courseDashboard-view").style.display = "none";
     document.getElementById("help-view").style.display = "block";
 }
 
+/* callback function */
 function showCourseDashboardView() {
     document.getElementById("help-view").style.display = "none";
     document.getElementById("courseDashboard-view").style.display = "block";
