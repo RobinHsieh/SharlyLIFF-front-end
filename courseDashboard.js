@@ -43,6 +43,7 @@ function renderCourseDashboardList(data) {
             </p>
             <p>補課次數規則: <em class="rule-strategy">${item.VIEW_LIMIT_STRATEGY}</em></p>
             <p>理由審核規則: <em class="rule-strategy">${item.REVIEW_REASON_STRATEGY}</em></p>
+            <p>共用天數: <em class="rule-strategy">${item.SHARE_DAYS ?? 2} 天</em></p>
             <div class="button-group">
             <button id="toggle-btn-${item.PK}" class="toggle-btn">
                 ${item.IS_OPEN ? "關閉梯次" : "開啟梯次"}
